@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://website-roaster-ai.vercel.app'
+  const baseUrl = 'https://website-roaster-ai-jade.vercel.app'
 
   return [
     {

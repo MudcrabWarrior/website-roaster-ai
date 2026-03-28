@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/success/'],
     },
-    sitemap: 'https://website-roaster-ai.vercel.app/sitemap.xml',
+    sitemap: 'https://website-roaster-ai-jade.vercel.app/sitemap.xml',
   }
 }

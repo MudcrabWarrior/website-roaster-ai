@@ -11,10 +11,10 @@ export const metadata: Metadata = {
     title: 'Website Roaster - AI Website Audit & Review Tool',
     description: 'Get brutally honest feedback on your website. AI-powered analysis and optimization suggestions.',
     type: 'website',
-    url: 'https://website-roaster-ai.vercel.app',
+    url: 'https://website-roaster-ai-jade.vercel.app',
     images: [
       {
-        url: 'https://website-roaster-ai.vercel.app/og-image.png',
+        url: 'https://website-roaster-ai-jade.vercel.app/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Website Roaster',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description: 'Get brutally honest feedback on your website with AI-powered analysis.',
   },
   alternates: {
-    canonical: 'https://website-roaster-ai.vercel.app',
+    canonical: 'https://website-roaster-ai-jade.vercel.app',
   },
 }
 
