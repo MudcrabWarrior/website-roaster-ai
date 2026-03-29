@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateFullAudit } from '@/lib/anthropic'
+import { validateUrl } from '@/lib/url-validator'
 
 function stripHtmlTags(html: string): string {
   let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -29,25 +30,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Session ID is required' }, { status: 400 })
     }
 
-    // Fetch the page content server-side
-    let normalizedUrl = url
-    if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
-      normalizedUrl = 'https://' + normalizedUrl
+    // SSRF protection: validate URL before fetching
+    const validation = validateUrl(url)
+    if (!validation.valid) {
+      return NextResponse.json(
+        { error: validation.error || 'Invalid URL' },
+        { status: 400 }
+      )
     }
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000)
 
-    const response = await fetch(normalizedUrl, {
+    const response = await fetch(validation.url, {
       method: 'GET',
       headers: {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
       },
       signal: controller.signal,
+      redirect: 'manual',
     })
 
     clearTimeout(timeoutId)
+
+    // Validate redirect targets
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location')
+      if (location) {
+        const redirectCheck = validateUrl(location)
+        if (!redirectCheck.valid) {
+          return NextResponse.json(
+            { error: 'Redirect target is not allowed.' },
+            { status: 400 }
+          )
+        }
+      }
+      return NextResponse.json(
+        { error: 'Could not follow redirect. Please try the final URL directly.' },
+        { status: 400 }
+      )
+    }
 
     if (!response.ok) {
       throw new Error(`Failed to fetch URL: HTTP ${response.status}`)
